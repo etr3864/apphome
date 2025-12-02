@@ -1,9 +1,9 @@
-import { useStore } from '@/store/useStore';
+import { useFirebaseData } from '@/lib/firebase/hooks';
 import { Card } from '@/components/ui/Card';
 import { formatCurrency } from '@/lib/utils/format';
 
 export const FixedExpenses = () => {
-  const { transactions } = useStore();
+  const { transactions } = useFirebaseData();
 
   const fixedExpenses = transactions
     .filter(tx => tx.type === 'EXPENSE' && tx.isFixed)

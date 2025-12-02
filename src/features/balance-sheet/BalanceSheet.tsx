@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStore } from '@/store/useStore';
+import { useFirebaseData } from '@/lib/firebase/hooks';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { formatCurrency, formatDateFull } from '@/lib/utils/format';
@@ -8,7 +8,7 @@ import { AssetForm } from './components/AssetForm';
 import { LiabilityForm } from './components/LiabilityForm';
 
 export const BalanceSheet = () => {
-  const { household, transactions, assets, liabilities } = useStore();
+  const { household, transactions, assets, liabilities } = useFirebaseData();
   const [showAssetForm, setShowAssetForm] = useState(false);
   const [showLiabilityForm, setShowLiabilityForm] = useState(false);
   const [editingAssetId, setEditingAssetId] = useState<string | null>(null);

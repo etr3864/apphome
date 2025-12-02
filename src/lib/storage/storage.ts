@@ -5,6 +5,7 @@ const STORAGE_KEYS = {
   HOUSEHOLD: 'houseapp_household',
   CATEGORIES: 'houseapp_categories',
   AI_CONVERSATION: 'houseapp_ai_conversation',
+  MIGRATED_TO_FIREBASE: 'houseapp_migrated_to_firebase',
 } as const;
 
 export const storage = {

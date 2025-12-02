@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStore } from '@/store/useStore';
+import { useFirebaseData } from '@/lib/firebase/hooks';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -21,7 +21,7 @@ const LIABILITY_TYPE_LABELS: Record<LiabilityType, string> = {
 };
 
 export const LiabilityForm = ({ editingId, onClose }: LiabilityFormProps) => {
-  const { liabilities, addLiability, updateLiability, deleteLiability } = useStore();
+  const { liabilities, addLiability, updateLiability, deleteLiability } = useFirebaseData();
   
   const editingLiability = editingId 
     ? liabilities.find(l => l.id === editingId) 
@@ -38,33 +38,47 @@ export const LiabilityForm = ({ editingId, onClose }: LiabilityFormProps) => {
       : ''
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const liability = {
-      id: editingId || generateId(),
+    const liabilityData: any = {
       type,
       name: name.trim(),
       totalAmount: Number(totalAmount),
       remainingAmount: Number(remainingAmount),
-      monthlyPayment: monthlyPayment ? Number(monthlyPayment) : undefined,
-      dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
       lastUpdatedAt: new Date().toISOString(),
     };
 
-    if (editingId) {
-      updateLiability(editingId, liability);
-    } else {
-      addLiability(liability);
+    // רק אם יש ערך - נוסיף את הפילד (Firestore לא אוהב undefined)
+    if (monthlyPayment) {
+      liabilityData.monthlyPayment = Number(monthlyPayment);
     }
-    
-    onClose();
+    if (dueDate) {
+      liabilityData.dueDate = new Date(dueDate).toISOString();
+    }
+
+    try {
+      if (editingId) {
+        await updateLiability(editingId, liabilityData);
+      } else {
+        await addLiability(liabilityData);
+      }
+      onClose();
+    } catch (error) {
+      console.error('Error saving liability:', error);
+      alert('שגיאה בשמירה');
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (editingId && confirm('למחוק את ההתחייבות?')) {
-      deleteLiability(editingId);
-      onClose();
+      try {
+        await deleteLiability(editingId);
+        onClose();
+      } catch (error) {
+        console.error('Error deleting liability:', error);
+        alert('שגיאה במחיקה');
+      }
     }
   };
 

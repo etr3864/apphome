@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useStore } from '@/store/useStore';
+import { useFirebaseData } from '@/lib/firebase/hooks';
 import { OpenAIService } from '@/lib/services/openai.service';
 import { Button } from '@/components/ui/Button';
 
@@ -13,7 +13,7 @@ interface AIHelperProps {
 }
 
 export const AIHelper = ({ onClose }: AIHelperProps) => {
-  const { household } = useStore();
+  const { household } = useFirebaseData();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -100,9 +100,9 @@ export const AIHelper = ({ onClose }: AIHelperProps) => {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50" dir="rtl" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 pb-20" dir="rtl" onClick={onClose}>
       <div 
-        className="w-full max-w-2xl bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col"
+        className="w-full max-w-2xl bg-white rounded-t-3xl shadow-2xl max-h-[75vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

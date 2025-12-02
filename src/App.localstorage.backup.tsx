@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { useFirebaseStore } from './store/useFirebaseStore';
-import { LoginPage } from './features/auth/LoginPage';
+import { useStore } from './store/useStore';
 import { Layout } from './components/layout/Layout';
 import { Dashboard } from './features/dashboard/Dashboard';
 import { Transactions } from './features/transactions/Transactions';
@@ -11,32 +9,13 @@ import { BalanceSheet } from './features/balance-sheet/BalanceSheet';
 import { Settings } from './features/settings/Settings';
 import { AIHelper } from './features/ai-helper/AIHelper';
 
-function AppContent() {
-  const { user, loading: authLoading } = useAuth();
-  const { setupListeners, cleanup } = useFirebaseStore();
+function App() {
+  const loadFromStorage = useStore(state => state.loadFromStorage);
   const [showAIHelper, setShowAIHelper] = useState(false);
 
   useEffect(() => {
-    if (user?.householdId) {
-      setupListeners(user.householdId);
-      return () => cleanup();
-    }
-  }, [user?.householdId, setupListeners, cleanup]);
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🏠</div>
-          <p className="text-xl font-semibold text-gray-600">טוען...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <LoginPage />;
-  }
+    loadFromStorage();
+  }, [loadFromStorage]);
 
   return (
     <BrowserRouter>
@@ -64,13 +43,4 @@ function AppContent() {
   );
 }
 
-function App() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
-}
-
 export default App;
-

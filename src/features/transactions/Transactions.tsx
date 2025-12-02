@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStore } from '@/store/useStore';
+import { useFirebaseData } from '@/lib/firebase/hooks';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { formatCurrency, formatDate } from '@/lib/utils/format';
@@ -7,7 +7,7 @@ import { TransactionForm } from './components/TransactionForm';
 import type { TransactionType } from '@/types/finance';
 
 export const Transactions = () => {
-  const { transactions } = useStore();
+  const { transactions } = useFirebaseData();
   const [selectedType, setSelectedType] = useState<TransactionType>('EXPENSE');
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear] = useState(new Date().getFullYear());

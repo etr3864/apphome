@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useStore } from '@/store/useStore';
+import { useFirebaseData } from '@/lib/firebase/hooks';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/Card';
 import { formatCurrency, formatDate } from '@/lib/utils/format';
 import { calculateMonthlySummary, getRecentTransactions } from '@/lib/utils/finance';
@@ -7,7 +8,8 @@ import { AddMenu } from './components/AddMenu';
 
 export const Dashboard = () => {
   const [showAddMenu, setShowAddMenu] = useState(false);
-  const { household, transactions, assets, liabilities } = useStore();
+  const { household, transactions, assets, liabilities } = useFirebaseData();
+  const { user } = useAuth();
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -24,6 +26,14 @@ export const Dashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Welcome Message */}
+      <div className="text-right">
+        <h1 className="text-3xl font-bold text-gray-800 mb-1">
+          שלום {user?.name || 'אורח'} 👋
+        </h1>
+        <p className="text-gray-600">מה נשמע היום?</p>
+      </div>
+
       {/* Current Balance - Main Card */}
       <Card className="bg-gradient-to-br from-primary-50 to-blue-50 border-2 border-primary-200">
         <div className="text-center">

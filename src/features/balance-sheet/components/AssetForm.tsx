@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStore } from '@/store/useStore';
+import { useFirebaseData } from '@/lib/firebase/hooks';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -23,7 +23,7 @@ const ASSET_TYPE_LABELS: Record<AssetType, string> = {
 };
 
 export const AssetForm = ({ editingId, onClose }: AssetFormProps) => {
-  const { assets, addAsset, updateAsset, deleteAsset } = useStore();
+  const { assets, addAsset, updateAsset, deleteAsset } = useFirebaseData();
   
   const editingAsset = editingId ? assets.find(a => a.id === editingId) : null;
 
@@ -31,30 +31,38 @@ export const AssetForm = ({ editingId, onClose }: AssetFormProps) => {
   const [name, setName] = useState(editingAsset?.name || '');
   const [value, setValue] = useState(editingAsset?.value.toString() || '');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const asset = {
-      id: editingId || generateId(),
+    const assetData = {
       type,
       name: name.trim(),
       value: Number(value),
       lastUpdatedAt: new Date().toISOString(),
     };
 
-    if (editingId) {
-      updateAsset(editingId, asset);
-    } else {
-      addAsset(asset);
+    try {
+      if (editingId) {
+        await updateAsset(editingId, assetData);
+      } else {
+        await addAsset(assetData);
+      }
+      onClose();
+    } catch (error) {
+      console.error('Error saving asset:', error);
+      alert('שגיאה בשמירה');
     }
-    
-    onClose();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (editingId && confirm('למחוק את הנכס?')) {
-      deleteAsset(editingId);
-      onClose();
+      try {
+        await deleteAsset(editingId);
+        onClose();
+      } catch (error) {
+        console.error('Error deleting asset:', error);
+        alert('שגיאה במחיקה');
+      }
     }
   };
 

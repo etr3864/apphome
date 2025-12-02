@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useStore } from '@/store/useStore';
+import { useState } from 'react';
+import { useFirebaseData } from '@/lib/firebase/hooks';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -32,7 +32,7 @@ const CATEGORY_LABELS: Record<TransactionCategory, string> = {
 };
 
 export const TransactionForm = ({ type, editingId, onClose }: TransactionFormProps) => {
-  const { transactions, addTransaction, updateTransaction, deleteTransaction } = useStore();
+  const { transactions, addTransaction, updateTransaction, deleteTransaction } = useFirebaseData();
   
   const editingTransaction = editingId 
     ? transactions.find(t => t.id === editingId)
@@ -48,33 +48,45 @@ export const TransactionForm = ({ type, editingId, onClose }: TransactionFormPro
   );
   const [isFixed, setIsFixed] = useState(editingTransaction?.isFixed || false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const transaction = {
-      id: editingId || generateId(),
+    const transactionData: any = {
       type,
       amount: Number(amount),
       category,
-      description: description.trim() || undefined,
       date: new Date(date).toISOString(),
       isFixed,
       createdAt: editingTransaction?.createdAt || new Date().toISOString(),
     };
 
-    if (editingId) {
-      updateTransaction(editingId, transaction);
-    } else {
-      addTransaction(transaction);
+    // רק אם יש תיאור - נוסיף אותו (Firestore לא אוהב undefined)
+    if (description.trim()) {
+      transactionData.description = description.trim();
     }
-    
-    onClose();
+
+    try {
+      if (editingId) {
+        await updateTransaction(editingId, transactionData);
+      } else {
+        await addTransaction(transactionData);
+      }
+      onClose();
+    } catch (error) {
+      console.error('Error saving transaction:', error);
+      alert('שגיאה בשמירה');
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (editingId && confirm('למחוק את התנועה?')) {
-      deleteTransaction(editingId);
-      onClose();
+      try {
+        await deleteTransaction(editingId);
+        onClose();
+      } catch (error) {
+        console.error('Error deleting transaction:', error);
+        alert('שגיאה במחיקה');
+      }
     }
   };
 
