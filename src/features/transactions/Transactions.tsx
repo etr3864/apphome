@@ -10,7 +10,7 @@ export const Transactions = () => {
   const { transactions } = useFirebaseData();
   const [selectedType, setSelectedType] = useState<TransactionType>('EXPENSE');
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -55,23 +55,35 @@ export const Transactions = () => {
         </Button>
       </div>
 
-      {/* Month Filter */}
+      {/* Date Filters */}
       <Card>
         <label className="block text-sm font-semibold text-gray-700 mb-2">
-          📅 בחר חודש
+          📅 בחר חודש ושנה
         </label>
-        <select
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(Number(e.target.value))}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl font-medium text-right bg-white"
-          dir="rtl"
-        >
-          {Array.from({ length: 12 }, (_, i) => (
-            <option key={i} value={i}>
-              {new Date(2025, i).toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}
-            </option>
-          ))}
-        </select>
+        <div className="space-y-3">
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl font-medium text-right bg-white"
+            dir="rtl"
+          >
+            {Array.from({ length: 12 }, (_, i) => (
+              <option key={i} value={i}>
+                {new Date(selectedYear, i).toLocaleDateString('he-IL', { month: 'long' })}
+              </option>
+            ))}
+          </select>
+          
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl font-medium text-right bg-white"
+            dir="rtl"
+          >
+            <option value={2025}>2025</option>
+            <option value={2026}>2026</option>
+          </select>
+        </div>
       </Card>
 
       {/* Total */}
