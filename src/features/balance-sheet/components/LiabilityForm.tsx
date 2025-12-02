@@ -3,7 +3,6 @@ import { useFirebaseData } from '@/lib/firebase/hooks';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { generateId } from '@/lib/utils/id';
 import type { LiabilityType } from '@/types/finance';
 
 interface LiabilityFormProps {

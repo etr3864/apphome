@@ -141,6 +141,8 @@ export const useStore = create<AppState>((set, get) => ({
         monthStartDay: 1,
         initialBalance: 0,
         balanceUpdatedAt: new Date().toISOString(),
+        ownerIds: [],
+        householdCode: '000000',
         createdAt: new Date().toISOString(),
       };
       storage.set('HOUSEHOLD', household);
